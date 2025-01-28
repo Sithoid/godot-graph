@@ -14,3 +14,8 @@ config/name="Skill Tree Test"
 run/main_scene="res://skill_tree.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

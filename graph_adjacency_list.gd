@@ -4,7 +4,7 @@ extends Resource
 ## This class stores graph data in an adjacency list.
 ## It's supposed to be used for directional acyclic graphs and can sort them and calculate shortest paths.
 
-## GDScript implementation by Sithoid (CC0); based on:
+## GDScript implementation by Sithoid; based on:
 ## https://www.geeksforgeeks.org/adjacency-list-meaning-definition-in-dsa/
 ## https://www.scaler.in/shortest-path-in-directed-acyclic-graph/
 
