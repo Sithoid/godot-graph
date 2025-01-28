@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsot36j0xc4s7"]
+
+[ext_resource type="Script" path="res://skill_tree.gd" id="1_4jcrs"]
+[ext_resource type="Texture2D" uid="uid://cx1c7bdq47sem" path="res://skilltree.png" id="2_6jhf2"]
+
+[node name="SkillTree" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_4jcrs")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_6jhf2")
