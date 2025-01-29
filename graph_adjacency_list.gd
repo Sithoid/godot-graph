@@ -89,13 +89,15 @@ func clear_list() -> void:
 #endregion
 
 #region Sorting and pathfinding
-## Topological sorting of the array. Returns the order in which the vertices can be reached
+## Topological sorting of the array. Returns the order in which vertices can be reached
 func top_sort() -> Array[int]:
 	clear_stack()
 	var visited : Array[bool]
 	visited.resize(list.size())
 	visited.fill(false)
 	for vertex_index : int in range(list.size()):
+		if visited[vertex_index]:
+			break
 		_recursive_top_sort(visited, vertex_index)
 	# GDScript doesn't have true LIFO stacks, so we're just reversing the array
 	stack.reverse()
@@ -105,8 +107,6 @@ func top_sort() -> Array[int]:
 
 ## Helper function for topological sorting
 func _recursive_top_sort(visited : Array[bool], vertex_index : int) -> void:
-	if visited[vertex_index]:
-		return
 	visited[vertex_index] = true
 	for edge : Array in list[vertex_index]:
 		var adjacent_vertex = edge[0]
@@ -118,12 +118,13 @@ func _recursive_top_sort(visited : Array[bool], vertex_index : int) -> void:
 func clear_stack() -> void:
 	stack.clear()
 
-## Returns shortest paths from the source vertex to all other vertices. Will sort if no stack exists
+## Returns shortest distances from the source vertex to all other vertices. Will sort if no stack exists
 ## Call dist[i] to learn the cost of travel from source to i
-## Distance from the vertex to itself is always 0; inf means this vertex can't be reached from there
-func get_distances(source_vertex : int) -> Array[float]:
+## Pass "reversed" to perform single-destination search instead of single-source
+func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]:
 	if source_vertex >= list.size():
 		print("Source vertex %s is not in this graph!" % source_vertex)
+		return []
 	# Sort if no pre-sorted stack is provided
 	if stack.is_empty():
 		top_sort()
@@ -132,13 +133,46 @@ func get_distances(source_vertex : int) -> Array[float]:
 	dist.resize(list.size())
 	dist.fill(INF)
 	dist[source_vertex] = 0.0
-	for vertex : int in stack:
-		for edge : Array in list[vertex]:
-			var adjacent_vertex = edge[0]
-			# edge[1] stores weight
-			if dist[adjacent_vertex] > dist[vertex] + edge[1]:
-				dist[adjacent_vertex] = dist[vertex] + edge[1]
-	print("Distances from %s:" % source_vertex)
+	# Turns this into single-destination search
+	if reversed:
+		for i in range(stack.size()-1, -1, -1):
+			var vertex : int = stack[i]
+			for edge : Array in list[vertex]:
+				var adjacent_vertex = edge[0]
+				if dist[vertex] > dist[adjacent_vertex] + edge[1]: # edge[1] stores weight
+					dist[vertex] = dist[adjacent_vertex] + edge[1]
+		print("Distances from %s:" % source_vertex)
+	# Standard single-source search
+	else:
+		for vertex : int in stack:
+			for edge : Array in list[vertex]:
+				var adjacent_vertex = edge[0]
+				if dist[adjacent_vertex] > dist[vertex] + edge[1]: # edge[1] stores weight
+					dist[adjacent_vertex] = dist[vertex] + edge[1]
+		print("Distances to %s:" % source_vertex)
 	print(dist)
 	return dist
+
+## Returns a sequence of vertices that constitute the shortest path
+func get_shortest_path(source : int, target : int) -> Array[int]:
+	# Runs SSSP and SDSP search
+	var dist_from_source : Array[float] = get_distances(source)
+	if dist_from_source[target] == 0:
+		print("Same source and target!")
+		return []
+	if dist_from_source[target] == INF:
+		print("%s can't be reached from %s!" % [target, source])
+		return []
+	var dist_to_target : Array[float] = get_distances(target, true)
+	# Cycles through the edges to find out which of them belong to the shortest path
+	# As per https://cs.stackexchange.com/questions/93720/finding-all-edges-on-any-shortest-path-between-two-nodes
+	var path_points : Array[int] = [source]
+	for edge_head : int in stack:
+		for edge : Array in list[edge_head]:
+			var edge_tail : int = edge[0]
+			if dist_from_source[edge_head] + edge[1] + dist_to_target[edge_tail] == dist_from_source[target]:
+				path_points.append(edge[0])
+	print("Shortest path from %s to %s (travel cost %s):" % [source, target, dist_from_source[target]])
+	print(path_points)
+	return path_points
 #endregion
