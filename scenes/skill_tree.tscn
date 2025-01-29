@@ -1,0 +1,132 @@
+[gd_scene load_steps=12 format=3 uid="uid://bsot36j0xc4s7"]
+
+[ext_resource type="Script" path="res://scenes/skill_tree.gd" id="1_kbj7i"]
+[ext_resource type="PackedScene" uid="uid://kxmeyca23ts1" path="res://components/tree_node.tscn" id="3_l5sdh"]
+[ext_resource type="Resource" uid="uid://b20vxc7i3tsp3" path="res://skills/magic_use.tres" id="4_71nup"]
+[ext_resource type="Resource" uid="uid://be4gmol1c2l27" path="res://skills/fly.tres" id="5_ym41q"]
+[ext_resource type="Resource" uid="uid://b4io3smhpvdsl" path="res://skills/healing.tres" id="6_lsqyb"]
+[ext_resource type="Resource" uid="uid://dqoqkx5rccbd0" path="res://skills/battle_magic.tres" id="7_erwcj"]
+[ext_resource type="Resource" uid="uid://du0ghrqsf5lih" path="res://skills/resurrect.tres" id="8_nv41a"]
+[ext_resource type="Resource" uid="uid://cjcch4il7v1ku" path="res://skills/full_regen.tres" id="9_h2h2w"]
+[ext_resource type="Resource" uid="uid://b4lqe1grpy38n" path="res://skills/eldritch_blast.tres" id="10_kvgfg"]
+[ext_resource type="Resource" uid="uid://c7bmqxc0p08oo" path="res://skills/fireball.tres" id="11_vq7p4"]
+[ext_resource type="Resource" uid="uid://cq0ta787ogxg" path="res://skills/armageddon.tres" id="12_wiunm"]
+
+[node name="SkillTree" type="Control"]
+z_index = 5
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kbj7i")
+
+[node name="Background" type="ColorRect" parent="."]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.870588, 0.803922, 0.741176, 1)
+
+[node name="TreeNode" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 474.0
+offset_top = 484.0
+offset_right = 602.0
+offset_bottom = 612.0
+tooltip_text = "Magic Use 
+Cost: 1"
+graph_data = ExtResource("4_71nup")
+
+[node name="TreeNode2" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 234.0
+offset_top = 421.0
+offset_right = 362.0
+offset_bottom = 549.0
+tooltip_text = "Fly 
+Cost: 1"
+graph_data = ExtResource("5_ym41q")
+
+[node name="TreeNode3" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 467.0
+offset_top = 282.0
+offset_right = 595.0
+offset_bottom = 410.0
+tooltip_text = "Healing Magic 
+Cost: 1"
+graph_data = ExtResource("6_lsqyb")
+
+[node name="TreeNode4" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 690.0
+offset_top = 385.0
+offset_right = 818.0
+offset_bottom = 513.0
+tooltip_text = "Battle Magic 
+Cost: 1"
+graph_data = ExtResource("7_erwcj")
+
+[node name="TreeNode5" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 287.0
+offset_top = 121.0
+offset_right = 415.0
+offset_bottom = 249.0
+tooltip_text = "Resurrect 
+Cost: 2"
+graph_data = ExtResource("8_nv41a")
+
+[node name="TreeNode6" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 471.0
+offset_top = 70.0
+offset_right = 599.0
+offset_bottom = 198.0
+tooltip_text = "Full Regen 
+Cost: 2"
+graph_data = ExtResource("9_h2h2w")
+
+[node name="TreeNode7" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 733.0
+offset_top = 169.0
+offset_right = 861.0
+offset_bottom = 297.0
+tooltip_text = "Eldritch Blast 
+Cost: 2"
+graph_data = ExtResource("10_kvgfg")
+
+[node name="TreeNode8" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 930.0
+offset_top = 257.0
+offset_right = 1058.0
+offset_bottom = 385.0
+tooltip_text = "Fireball 
+Cost: 2"
+graph_data = ExtResource("11_vq7p4")
+
+[node name="TreeNode9" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 958.0
+offset_top = 43.0
+offset_right = 1086.0
+offset_bottom = 171.0
+tooltip_text = "Armageddon 
+Cost: 3"
+graph_data = ExtResource("12_wiunm")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3 uid="uid://cq0ta787ogxg"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_p2bn4"]
+[ext_resource type="Resource" uid="uid://c7bmqxc0p08oo" path="res://skills/fireball.tres" id="2_r8uaa"]
+
+[resource]
+script = ExtResource("1_p2bn4")
+skill_name = "Armageddon"
+prerequisites = Array[ExtResource("1_p2bn4")]([ExtResource("2_r8uaa")])
+cost = 3.0

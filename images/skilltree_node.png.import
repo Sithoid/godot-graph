@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cx1c7bdq47sem"
-path="res://.godot/imported/skilltree.png-34286dac885baf1d88d452dd8777f7df.ctex"
+uid="uid://cijtvkidgf02n"
+path="res://.godot/imported/skilltree_node.png-4a95bea483ec32cd8dde5d0578c0e7f0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://skilltree.png"
-dest_files=["res://.godot/imported/skilltree.png-34286dac885baf1d88d452dd8777f7df.ctex"]
+source_file="res://images/skilltree_node.png"
+dest_files=["res://.godot/imported/skilltree_node.png-4a95bea483ec32cd8dde5d0578c0e7f0.ctex"]
 
 [params]
 

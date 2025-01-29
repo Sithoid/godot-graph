@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3 uid="uid://du0ghrqsf5lih"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_y6oiv"]
+[ext_resource type="Resource" uid="uid://b4io3smhpvdsl" path="res://skills/healing.tres" id="2_ae33o"]
+
+[resource]
+script = ExtResource("1_y6oiv")
+skill_name = "Resurrect"
+prerequisites = Array[ExtResource("1_y6oiv")]([ExtResource("2_ae33o")])
+cost = 2.0

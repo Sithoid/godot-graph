@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3 uid="uid://cjcch4il7v1ku"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_cbptm"]
+[ext_resource type="Resource" uid="uid://b4io3smhpvdsl" path="res://skills/healing.tres" id="2_oostt"]
+
+[resource]
+script = ExtResource("1_cbptm")
+skill_name = "Full Regen"
+prerequisites = Array[ExtResource("1_cbptm")]([ExtResource("2_oostt")])
+cost = 2.0

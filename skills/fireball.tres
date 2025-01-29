@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3 uid="uid://c7bmqxc0p08oo"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_oqoj4"]
+[ext_resource type="Resource" uid="uid://dqoqkx5rccbd0" path="res://skills/battle_magic.tres" id="2_74bxu"]
+
+[resource]
+script = ExtResource("1_oqoj4")
+skill_name = "Fireball"
+prerequisites = Array[ExtResource("1_oqoj4")]([ExtResource("2_74bxu")])
+cost = 2.0

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3 uid="uid://b4io3smhpvdsl"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_wbhgb"]
+[ext_resource type="Resource" uid="uid://b20vxc7i3tsp3" path="res://skills/magic_use.tres" id="2_v4ova"]
+
+[resource]
+script = ExtResource("1_wbhgb")
+skill_name = "Healing Magic"
+prerequisites = Array[ExtResource("1_wbhgb")]([ExtResource("2_v4ova")])
+cost = 1.0

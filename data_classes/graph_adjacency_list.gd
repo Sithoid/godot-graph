@@ -46,7 +46,7 @@ func add_vertex() -> Array[Array]:
 ## Removes a vertex at a given index. Also removes all edges that connect to it
 func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
 	clear_stack()
-	if vertex_index_to_remove < 0 or vertex_index_to_remove >= list.size():
+	if not vertex_index_to_remove in range(list.size()):
 		print("Can't remove a nonexistent vertex")
 		return list
 	for vertex_index : int in range(list.size()):
@@ -58,7 +58,7 @@ func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
 ## An edge is represented with a class for easier referencing
 func add_edge(source_vertex : int, target_vertex : int, weight : float = 1.0) -> Array[Array]:
 	clear_stack()
-	if source_vertex < 0 or source_vertex >= list.size() or target_vertex < 0 or target_vertex >= list.size():
+	if not (source_vertex in range(list.size()) and target_vertex in range(list.size())):
 		print("Can't connect nonexistent vertices")
 		return list
 	if source_vertex == target_vertex:
@@ -76,7 +76,7 @@ func add_edge(source_vertex : int, target_vertex : int, weight : float = 1.0) ->
 ## Removes an edge connecting two given vertices
 func remove_edge(source_vertex : int, target_vertex : int) -> Array[Array]:
 	clear_stack()
-	if source_vertex < 0 or source_vertex >= list.size() or target_vertex < 0 or target_vertex >= list.size():
+	if not (source_vertex in range(list.size()) and target_vertex in range(list.size())):
 		print("Can't remove an edge from nonexistent vertices")
 		return list
 	for edge : GraphEdge in list[source_vertex]:
@@ -124,7 +124,7 @@ func clear_stack() -> void:
 ## Call dist[i] to learn the cost of travel from source to i
 ## Pass "reversed" to perform single-destination search instead of single-source
 func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]:
-	if source_vertex < 0 or source_vertex >= list.size():
+	if not source_vertex in range(list.size()):
 		print("Source vertex %s is not in this graph!" % source_vertex)
 		return []
 	# Sort if no pre-sorted stack is provided
@@ -142,20 +142,28 @@ func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]
 			for edge : GraphEdge in list[vertex]:
 				if dist[vertex] > dist[edge.head] + edge.weight:
 					dist[vertex] = dist[edge.head] + edge.weight
-		print("Distances from %s:" % source_vertex)
+		print("Distances to %s:" % source_vertex)
 	# Standard single-source search
 	else:
 		for vertex : int in stack:
 			for edge : GraphEdge in list[vertex]:
 				if dist[edge.head] > dist[vertex] + edge.weight:
 					dist[edge.head] = dist[vertex] + edge.weight
-		print("Distances to %s:" % source_vertex)
+		print("Distances from %s:" % source_vertex)
 	print(dist)
 	return dist
 
+## Returns an array of all edges in this graph
+func get_all_edges() -> Array[GraphEdge]:
+	var edges : Array[GraphEdge] = []
+	for vertex : Array in list:
+		for edge : GraphEdge in vertex:
+			edges.append(edge)
+	return edges
+
 ## Returns a sequence of edges that constitute the shortest path
 func get_shortest_path(source : int, target : int) -> Array[GraphEdge]:
-	if source < 0 or source >= list.size() or target < 0 or target >= list.size():
+	if not (source in range(list.size()) and target in range(list.size())):
 		print("Nonexistent source or target!")
 		return []
 	if source == target:
@@ -169,7 +177,7 @@ func get_shortest_path(source : int, target : int) -> Array[GraphEdge]:
 	var dist_to_target : Array[float] = get_distances(target, true)
 	# Cycles through all edges to find out which of them belong to the shortest path
 	var path_edges : Array[GraphEdge] = []
-	for edge_tail : int in list.size():
+	for edge_tail : int in range(list.size()):
 		for edge : GraphEdge in list[edge_tail]:
 			if dist_from_source[edge_tail] + edge.weight + dist_to_target[edge.head] == dist_from_source[target]:
 				path_edges.append(edge)
