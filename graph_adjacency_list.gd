@@ -2,11 +2,12 @@ class_name GraphAdjacencyList
 extends Resource
 
 ## This class stores graph data in an adjacency list.
-## It's supposed to be used for directional acyclic graphs and can sort them and calculate shortest paths.
+## It's supposed to be used for weighted directional acyclic graphs and can sort them and calculate shortest paths.
 
 ## GDScript implementation by Sithoid; based on:
 ## https://www.geeksforgeeks.org/adjacency-list-meaning-definition-in-dsa/
 ## https://www.scaler.in/shortest-path-in-directed-acyclic-graph/
+## https://cs.stackexchange.com/questions/93720/finding-all-edges-on-any-shortest-path-between-two-nodes
 
 ## Main storage
 var list : Array[Array] = [] ## Adjacency list this class operates on
@@ -22,8 +23,8 @@ func print_list() -> void:
 	print("Adjacency list representation:")
 	for vertex_index : int in range(list.size()):
 		var line := "Vertex %s:" % vertex_index
-		for edge : Array in list[vertex_index]:
-			line += " target %s, weight %s;" % [edge[0], edge[1]] 
+		for edge : GraphEdge in list[vertex_index]:
+			line += " target %s, weight %s;" % [edge.head, edge.weight] 
 		print(line)
 #endregion
 
@@ -45,7 +46,7 @@ func add_vertex() -> Array[Array]:
 ## Removes a vertex at a given index. Also removes all edges that connect to it
 func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
 	clear_stack()
-	if vertex_index_to_remove > list.size():
+	if vertex_index_to_remove < 0 or vertex_index_to_remove >= list.size():
 		print("Can't remove a nonexistent vertex")
 		return list
 	for vertex_index : int in range(list.size()):
@@ -54,31 +55,32 @@ func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
 	return list
 
 ## Adds an edge between two given vertices
-## An edge is an array holding the index of the target vertex and the weight (cost) of transition
+## An edge is represented with a class for easier referencing
 func add_edge(source_vertex : int, target_vertex : int, weight : float = 1.0) -> Array[Array]:
 	clear_stack()
-	if source_vertex >= list.size() or target_vertex >= list.size():
+	if source_vertex < 0 or source_vertex >= list.size() or target_vertex < 0 or target_vertex >= list.size():
 		print("Can't connect nonexistent vertices")
 		return list
 	if source_vertex == target_vertex:
 		print("Can't connect a vertex to itself")
 		return list
-	for edge : Array in list[source_vertex]:
-		if edge[0] == target_vertex:
+	for old_edge : GraphEdge in list[source_vertex]:
+		if old_edge.head == target_vertex:
 			print("This edge already exists")
 			return list
 	# The vertex stores outgoing edges
-	list[source_vertex].append([target_vertex, weight])
+	var edge := GraphEdge.new(source_vertex, target_vertex, weight)
+	list[source_vertex].append(edge)
 	return list
 
 ## Removes an edge connecting two given vertices
 func remove_edge(source_vertex : int, target_vertex : int) -> Array[Array]:
 	clear_stack()
-	if source_vertex >= list.size() or target_vertex >= list.size():
+	if source_vertex < 0 or source_vertex >= list.size() or target_vertex < 0 or target_vertex >= list.size():
 		print("Can't remove an edge from nonexistent vertices")
 		return list
-	for edge : Array in list[source_vertex]:
-		if edge[0] == target_vertex:
+	for edge : GraphEdge in list[source_vertex]:
+		if edge.head == target_vertex:
 			list[source_vertex].erase(edge)
 	return list
 
@@ -89,7 +91,7 @@ func clear_list() -> void:
 #endregion
 
 #region Sorting and pathfinding
-## Topological sorting of the array. Returns the order in which vertices can be reached
+## Topological sorting of the list. Returns the order in which vertices can be reached
 func top_sort() -> Array[int]:
 	clear_stack()
 	var visited : Array[bool]
@@ -108,8 +110,8 @@ func top_sort() -> Array[int]:
 ## Helper function for topological sorting
 func _recursive_top_sort(visited : Array[bool], vertex_index : int) -> void:
 	visited[vertex_index] = true
-	for edge : Array in list[vertex_index]:
-		var adjacent_vertex = edge[0]
+	for edge : GraphEdge in list[vertex_index]:
+		var adjacent_vertex = edge.head
 		if visited[adjacent_vertex] == false:
 			_recursive_top_sort(visited, adjacent_vertex)
 	stack.push_back(vertex_index)
@@ -122,7 +124,7 @@ func clear_stack() -> void:
 ## Call dist[i] to learn the cost of travel from source to i
 ## Pass "reversed" to perform single-destination search instead of single-source
 func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]:
-	if source_vertex >= list.size():
+	if source_vertex < 0 or source_vertex >= list.size():
 		print("Source vertex %s is not in this graph!" % source_vertex)
 		return []
 	# Sort if no pre-sorted stack is provided
@@ -133,46 +135,77 @@ func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]
 	dist.resize(list.size())
 	dist.fill(INF)
 	dist[source_vertex] = 0.0
-	# Turns this into single-destination search
+	# Reversing turns this into single-destination search
 	if reversed:
 		for i in range(stack.size()-1, -1, -1):
 			var vertex : int = stack[i]
-			for edge : Array in list[vertex]:
-				var adjacent_vertex = edge[0]
-				if dist[vertex] > dist[adjacent_vertex] + edge[1]: # edge[1] stores weight
-					dist[vertex] = dist[adjacent_vertex] + edge[1]
+			for edge : GraphEdge in list[vertex]:
+				if dist[vertex] > dist[edge.head] + edge.weight:
+					dist[vertex] = dist[edge.head] + edge.weight
 		print("Distances from %s:" % source_vertex)
 	# Standard single-source search
 	else:
 		for vertex : int in stack:
-			for edge : Array in list[vertex]:
-				var adjacent_vertex = edge[0]
-				if dist[adjacent_vertex] > dist[vertex] + edge[1]: # edge[1] stores weight
-					dist[adjacent_vertex] = dist[vertex] + edge[1]
+			for edge : GraphEdge in list[vertex]:
+				if dist[edge.head] > dist[vertex] + edge.weight:
+					dist[edge.head] = dist[vertex] + edge.weight
 		print("Distances to %s:" % source_vertex)
 	print(dist)
 	return dist
 
-## Returns a sequence of vertices that constitute the shortest path
-func get_shortest_path(source : int, target : int) -> Array[int]:
-	# Runs SSSP and SDSP search
-	var dist_from_source : Array[float] = get_distances(source)
-	if dist_from_source[target] == 0:
+## Returns a sequence of edges that constitute the shortest path
+func get_shortest_path(source : int, target : int) -> Array[GraphEdge]:
+	if source < 0 or source >= list.size() or target < 0 or target >= list.size():
+		print("Nonexistent source or target!")
+		return []
+	if source == target:
 		print("Same source and target!")
 		return []
+	# Runs SSSP and SDSP search
+	var dist_from_source : Array[float] = get_distances(source)
 	if dist_from_source[target] == INF:
 		print("%s can't be reached from %s!" % [target, source])
 		return []
 	var dist_to_target : Array[float] = get_distances(target, true)
-	# Cycles through the edges to find out which of them belong to the shortest path
-	# As per https://cs.stackexchange.com/questions/93720/finding-all-edges-on-any-shortest-path-between-two-nodes
-	var path_points : Array[int] = [source]
-	for edge_head : int in stack:
-		for edge : Array in list[edge_head]:
-			var edge_tail : int = edge[0]
-			if dist_from_source[edge_head] + edge[1] + dist_to_target[edge_tail] == dist_from_source[target]:
-				path_points.append(edge[0])
+	# Cycles through all edges to find out which of them belong to the shortest path
+	var path_edges : Array[GraphEdge] = []
+	for edge_tail : int in list.size():
+		for edge : GraphEdge in list[edge_tail]:
+			if dist_from_source[edge_tail] + edge.weight + dist_to_target[edge.head] == dist_from_source[target]:
+				path_edges.append(edge)
 	print("Shortest path from %s to %s (travel cost %s):" % [source, target, dist_from_source[target]])
+	for edge : GraphEdge in path_edges:
+		print(edge.get_as_array())
+	return path_edges
+
+## Retutns the shortest path as vertices instead of edges
+func get_shortest_path_points(source : int, target : int) -> Array[int]:
+	var path_points : Array[int] = [source]
+	var path_edges := get_shortest_path(source, target)
+	for edge : GraphEdge in path_edges:
+		path_points.append(edge.head)
+	print("Path points:")
 	print(path_points)
 	return path_points
+#endregion
+
+#region Classes
+## An edge is stored in the source node (edge's tail) and can be sufficiently defined as an array [head, weight].
+## However, it won't hurt to store the tail here as well for easier access.
+class GraphEdge extends RefCounted:
+	var tail : int ## Source node index
+	var head : int ## Target node index
+	var weight : float = 1.0 ## Travel cost
+	
+	## Arguments for the new() call
+	func _init(p_tail : int, p_head : int, p_weight : float = 1.0) -> void:
+		tail = p_tail
+		head = p_head
+		weight = p_weight
+	
+	## Returns parameters of the edge in an array. If strict definition is requested, omits the tail
+	func get_as_array(strict_definition : bool = false) -> Array:
+		if strict_definition:
+			return [head, weight]
+		return [tail, head, weight]
 #endregion

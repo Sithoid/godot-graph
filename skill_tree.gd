@@ -15,4 +15,4 @@ func _ready() -> void:
 	graph.add_edge(7, 8, 3.0)
 
 	graph.print_list()
-	graph.get_shortest_path(0, 8)
+	graph.get_shortest_path_points(0, 8)
