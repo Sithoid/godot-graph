@@ -1,7 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://bsot36j0xc4s7"]
+[gd_scene load_steps=13 format=3 uid="uid://bsot36j0xc4s7"]
 
 [ext_resource type="Script" path="res://scenes/skill_tree.gd" id="1_kbj7i"]
-[ext_resource type="PackedScene" uid="uid://kxmeyca23ts1" path="res://components/tree_node.tscn" id="3_l5sdh"]
+[ext_resource type="PackedScene" uid="uid://kxmeyca23ts1" path="res://components/tree_node_ui.tscn" id="3_l5sdh"]
 [ext_resource type="Resource" uid="uid://b20vxc7i3tsp3" path="res://skills/magic_use.tres" id="4_71nup"]
 [ext_resource type="Resource" uid="uid://be4gmol1c2l27" path="res://skills/fly.tres" id="5_ym41q"]
 [ext_resource type="Resource" uid="uid://b4io3smhpvdsl" path="res://skills/healing.tres" id="6_lsqyb"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://cjcch4il7v1ku" path="res://skills/full_regen.tres" id="9_h2h2w"]
 [ext_resource type="Resource" uid="uid://b4lqe1grpy38n" path="res://skills/eldritch_blast.tres" id="10_kvgfg"]
 [ext_resource type="Resource" uid="uid://c7bmqxc0p08oo" path="res://skills/fireball.tres" id="11_vq7p4"]
+[ext_resource type="Resource" uid="uid://4p5djrngd4ya" path="res://skills/create_a_religion.tres" id="12_wgenp"]
 [ext_resource type="Resource" uid="uid://cq0ta787ogxg" path="res://skills/armageddon.tres" id="12_wiunm"]
 
 [node name="SkillTree" type="Control"]
@@ -31,6 +32,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.870588, 0.803922, 0.741176, 1)
+
+[node name="CheckButton" type="CheckButton" parent="."]
+layout_mode = 0
+offset_right = 182.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Single Path Mode"
 
 [node name="TreeNode" parent="." instance=ExtResource("3_l5sdh")]
 self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
@@ -130,3 +138,16 @@ offset_bottom = 171.0
 tooltip_text = "Armageddon 
 Cost: 3"
 graph_data = ExtResource("12_wiunm")
+
+[node name="TreeNodeUI" parent="." instance=ExtResource("3_l5sdh")]
+self_modulate = Color(0.870588, 0.556863, 0.0666667, 1)
+layout_mode = 0
+offset_left = 63.0
+offset_top = 141.0
+offset_right = 191.0
+offset_bottom = 269.0
+tooltip_text = "Create a Religion 
+Cost: 1"
+graph_data = ExtResource("12_wgenp")
+
+[connection signal="toggled" from="CheckButton" to="." method="_on_check_button_toggled"]

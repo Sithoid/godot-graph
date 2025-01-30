@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cijtvkidgf02n" path="res://images/skilltree_node.png" id="1_il1yt"]
 [ext_resource type="Script" path="res://components/tree_node_ui.gd" id="2_ul8wg"]
 
-[node name="TreeNode" type="TextureRect"]
+[node name="TreeNodeUI" type="TextureRect"]
 offset_right = 128.0
 offset_bottom = 128.0
 pivot_offset = Vector2(64, 64)

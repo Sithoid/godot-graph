@@ -8,6 +8,7 @@ extends Resource
 ## https://www.geeksforgeeks.org/adjacency-list-meaning-definition-in-dsa/
 ## https://www.scaler.in/shortest-path-in-directed-acyclic-graph/
 ## https://cs.stackexchange.com/questions/93720/finding-all-edges-on-any-shortest-path-between-two-nodes
+## https://www.algotree.org/algorithms/tree_graph_traversal/depth_first_search/all_paths_in_a_graph/
 
 ## Main storage
 var list : Array[Array] = [] ## Adjacency list this class operates on
@@ -39,13 +40,13 @@ func create_list(vertices : int) -> Array[Array]:
 ## Adds a new vertex at the end of the list
 ## A vertex is addressed by its index and is represented with an array holding its outgoing edges.
 func add_vertex() -> Array[Array]:
-	clear_stack()
+	clear_sorting_caches()
 	list.append([])
 	return list
 
 ## Removes a vertex at a given index. Also removes all edges that connect to it
 func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
-	clear_stack()
+	clear_sorting_caches()
 	if not vertex_index_to_remove in range(list.size()):
 		print("Can't remove a nonexistent vertex")
 		return list
@@ -57,7 +58,7 @@ func remove_vertex(vertex_index_to_remove : int) -> Array[Array]:
 ## Adds an edge between two given vertices
 ## An edge is represented with a class for easier referencing
 func add_edge(source_vertex : int, target_vertex : int, weight : float = 1.0) -> Array[Array]:
-	clear_stack()
+	clear_sorting_caches()
 	if not (source_vertex in range(list.size()) and target_vertex in range(list.size())):
 		print("Can't connect nonexistent vertices")
 		return list
@@ -75,7 +76,7 @@ func add_edge(source_vertex : int, target_vertex : int, weight : float = 1.0) ->
 
 ## Removes an edge connecting two given vertices
 func remove_edge(source_vertex : int, target_vertex : int) -> Array[Array]:
-	clear_stack()
+	clear_sorting_caches()
 	if not (source_vertex in range(list.size()) and target_vertex in range(list.size())):
 		print("Can't remove an edge from nonexistent vertices")
 		return list
@@ -86,14 +87,47 @@ func remove_edge(source_vertex : int, target_vertex : int) -> Array[Array]:
 
 ## Resets the list and the stack
 func clear_list() -> void:
-	clear_stack()
+	clear_sorting_caches()
 	list.clear()
 #endregion
 
-#region Sorting and pathfinding
-## Topological sorting of the list. Returns the order in which vertices can be reached
+#region Accessing elements
+## Returns an array of all vertex indices in this graph
+func get_all_vertices() -> Array[int]:
+	var vertices : Array[int]
+	for index : int in range(list.size()):
+		vertices.append(index)
+	return vertices
+
+## Returns an array of all edges in this graph
+func get_all_edges() -> Array[GraphEdge]:
+	var edges : Array[GraphEdge] = []
+	for vertex : Array in list:
+		for edge : GraphEdge in vertex:
+			edges.append(edge)
+	return edges
+
+## Returns an array of all sources, aka vertices with indegree 0, i.e. those without incoming edges
+func get_all_sources() -> Array[int]:
+	var sources : Array[int] = get_all_vertices()
+	for edge : GraphEdge in get_all_edges():
+		sources.erase(edge.head)
+	return sources
+
+## Returns an array of all sinks, aka vertices with outdegree 0, i.e. those without outgoing edges
+func get_all_sinks() -> Array[int]:
+	var sinks : Array[int] = []
+	for vertex : Array in list:
+		if vertex.is_empty():
+			sinks.append(vertex)
+	return sinks
+#endregion
+
+#region Sorting algorithms
+## Topological sorting of the list. Returns the order in which vertices can be reached.
+## Used in finding the shortest path. Not guaranteed to be unique
 func top_sort() -> Array[int]:
-	clear_stack()
+	stack.clear()
 	var visited : Array[bool]
 	visited.resize(list.size())
 	visited.fill(false)
@@ -116,10 +150,23 @@ func _recursive_top_sort(visited : Array[bool], vertex_index : int) -> void:
 			_recursive_top_sort(visited, adjacent_vertex)
 	stack.push_back(vertex_index)
 
-## Clears the stack in order to sort anew
-func clear_stack() -> void:
+## Clears the stack if the graph has changed
+## If other sorting caches are used (such as arrays of sources/sinks), clear them here too
+func clear_sorting_caches() -> void:
 	stack.clear()
 
+## Recursive depth-first search used in finding all paths
+func _dfs(source : int, destination : int, path : Array[int], all_paths : Array[Array]) -> void:
+	if source == destination:
+		all_paths.append(path.duplicate())
+	else:
+		for edge : GraphEdge in list[source]:
+			path.append(edge.head)
+			_dfs(edge.head, destination, path, all_paths)
+			path.pop_back()
+#endregion
+
+#region Pathfinding
 ## Returns shortest distances from the source vertex to all other vertices. Will sort if no stack exists
 ## Call dist[i] to learn the cost of travel from source to i
 ## Pass "reversed" to perform single-destination search instead of single-source
@@ -153,15 +200,7 @@ func get_distances(source_vertex : int, reversed : bool = false) -> Array[float]
 	print(dist)
 	return dist
 
-## Returns an array of all edges in this graph
-func get_all_edges() -> Array[GraphEdge]:
-	var edges : Array[GraphEdge] = []
-	for vertex : Array in list:
-		for edge : GraphEdge in vertex:
-			edges.append(edge)
-	return edges
-
-## Returns a sequence of edges that constitute the shortest path
+## Returns a sequence of edges that constitutes the shortest path
 func get_shortest_path(source : int, target : int) -> Array[GraphEdge]:
 	if not (source in range(list.size()) and target in range(list.size())):
 		print("Nonexistent source or target!")
@@ -195,6 +234,34 @@ func get_shortest_path_points(source : int, target : int) -> Array[int]:
 	print("Path points:")
 	print(path_points)
 	return path_points
+
+## Returns all paths between given nodes as arrays of vertices.
+## Useful for listing prerequisites for visiting a vertex.
+func get_all_paths_as_points(source_vertex : int, target_vertex : int) -> Array[Array]:
+	if not (source_vertex in range(list.size()) and target_vertex in range(list.size())):
+		print("One or both vertices %s and %s are not in this graph!" % [source_vertex, target_vertex])
+		return []
+	var all_paths : Array[Array]
+	var path : Array[int] = [source_vertex]
+	_dfs(source_vertex, target_vertex, path, all_paths)
+	print("All paths from %s to %s as points:" % [source_vertex, target_vertex])
+	print(all_paths)
+	return all_paths
+
+## Returns all paths between given nodes as an array of edges.
+## Useful for highlighting edges while listing prerequisites.
+func get_all_paths_as_edges(source_vertex : int, target_vertex : int) -> Array[GraphEdge]:
+	var paths : Array[Array] = get_all_paths_as_points(source_vertex, target_vertex)
+	var all_path_edges : Array[GraphEdge]
+	for path : Array[int] in paths:
+		for step_index : int in range(path.size() - 1):
+			for edge : GraphEdge in list[path[step_index]]:
+				if edge.head == path[step_index + 1]:
+					all_path_edges.append(edge)
+	print("All paths from %s to %s as edges:" % [source_vertex, target_vertex])
+	for edge : GraphEdge in all_path_edges:
+		print(edge.get_as_array())
+	return all_path_edges
 #endregion
 
 #region Classes

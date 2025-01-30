@@ -9,6 +9,7 @@ extends Control
 ## Feel free to add, remove and move nodes however you like; as long as the data is correct,
 ## the graph will generate and provide pathfinding when launched.
 
+#region Variables
 ## Press to generate the graph in-editor
 @export var generate : bool = false:
 	set(value):
@@ -48,29 +49,61 @@ extends Control
 		background_color = new_color
 		background.color = background_color
 
+var single_path : bool = false ## Toggles between highlighting the shortest path or all paths
+
+## Data storage
 var nodes_array : Array[SkillTreeNode] = [] ## Holds references to the nodes in graph vertex order
 var skills_array : Array[SkillData] = [] ## Holds references to the data within nodes in graph vertex order
 var graph : GraphAdjacencyList = null ## Graph built from the scene. Can be operated upon
 var highlighted_edges : Array[GraphAdjacencyList.GraphEdge] = [] ## Temp storage for highlighted edges
 
-@onready var background = $Background
+@onready var background : ColorRect = $Background
+#endregion
 
+#region Main
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		generate_graph()
-	# Trigger the setters
-	node_color = node_color
-	text_color = text_color
 
+## Draws a visual representation of all edges when prompted by queue_redraw()
+func _draw() -> void:
+	if graph != null and nodes_array != []:
+		var edges : Array[GraphAdjacencyList.GraphEdge] = graph.get_all_edges()
+		for edge : GraphAdjacencyList.GraphEdge in edges:
+			var draw_color : Color
+			if highlighted_edges != [] and edge in highlighted_edges:
+				draw_color = edge_highlight_color
+			else:
+				draw_color = edge_color
+			draw_line(
+				nodes_array[edge.head].position + nodes_array[edge.head].pivot_offset,
+				nodes_array[edge.tail].position + nodes_array[edge.head].pivot_offset,
+				draw_color,
+				7.0)
+	highlighted_edges.clear()
+#endregion
+
+#region Inputs
 ## Triggers pathfinding when a node in the tree is clicked (in-game only)
 func _on_tree_node_input(event : InputEvent, index : int) -> void:
 	if event is InputEventMouseButton and event.is_pressed():
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			accept_event()
-			# Highlights the path from the tree root to the clicked node
-			highlighted_edges = graph.get_shortest_path(0, index)
+			if single_path == true:
+				# Highlights the path from the tree root to the clicked node
+				highlighted_edges = graph.get_shortest_path(0, index)
+			else:
+				# Highlights all paths from the root to the clicked node, i.e. prerequisites
+				highlighted_edges = graph.get_all_paths_as_edges(0, index)
 			queue_redraw()
 
+## Toggles highlighting the shortest path / all paths
+func _on_check_button_toggled(toggled_on : bool) -> void:
+	get_viewport().set_input_as_handled()
+	single_path = toggled_on
+#endregion
+
+#region Data handling
 ## Finds and stores all nodes that qualify as vertices of the tree
 func collect_tree() -> void:
 	for node : Node in find_children("*", "SkillTreeNode"):
@@ -100,29 +133,16 @@ func generate_graph() -> GraphAdjacencyList:
 				print("Prerequisite %s not found in the tree!" % prev_skill.skill_name)
 				return null
 			graph.add_edge(prev_index, index, skills_array[index].cost)
+	# Trigger the setters
+	node_color = node_color
+	text_color = text_color
 	graph.print_list()
 	queue_redraw()
 	return graph
-
-## Draws a visual representation of all edges when prompted by queue_redraw()
-func _draw() -> void:
-	if graph != null and nodes_array != []:
-		var edges : Array[GraphAdjacencyList.GraphEdge] = graph.get_all_edges()
-		for edge : GraphAdjacencyList.GraphEdge in edges:
-			var draw_color : Color
-			if highlighted_edges != [] and edge in highlighted_edges:
-				draw_color = edge_highlight_color
-			else:
-				draw_color = edge_color
-			draw_line(
-				nodes_array[edge.head].position + nodes_array[edge.head].pivot_offset,
-				nodes_array[edge.tail].position + nodes_array[edge.head].pivot_offset,
-				draw_color,
-				7.0)
-	highlighted_edges.clear()
 
 ## Clears all persistent data
 func clear_graph() -> void:
 	nodes_array.clear()
 	skills_array.clear()
 	graph = null
+#endregion

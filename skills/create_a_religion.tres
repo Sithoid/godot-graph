@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3 uid="uid://4p5djrngd4ya"]
+
+[ext_resource type="Script" path="res://data_classes/skill_data.gd" id="1_nlj38"]
+[ext_resource type="Resource" uid="uid://be4gmol1c2l27" path="res://skills/fly.tres" id="2_g4tq4"]
+[ext_resource type="Resource" uid="uid://du0ghrqsf5lih" path="res://skills/resurrect.tres" id="3_bdtmy"]
+
+[resource]
+script = ExtResource("1_nlj38")
+skill_name = "Create a Religion"
+prerequisites = Array[ExtResource("1_nlj38")]([ExtResource("2_g4tq4"), ExtResource("3_bdtmy")])
+cost = 4.0
